@@ -85,4 +85,11 @@ public func routes(_ router: Router) throws {
 				return acronym
 			}
 	}
+	
+	/// Get sorted acronyms
+	router.get("api", "acronyms", "sorted") { req -> Future<[Acronym]> in
+		return Acronym.query(on: req)
+			.sort(\.short, .ascending)
+			.all()
+	}
 }
