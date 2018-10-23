@@ -73,4 +73,16 @@ public func routes(_ router: Router) throws {
 			or.filter(\.long == searchTerm)
 		}.all()
 	}
+	
+	/// Get first acronym
+	router.get("api", "acronyms", "first") { req -> Future<Acronym> in
+		return Acronym.query(on: req)
+			.first()
+			.map(to: Acronym.self) { acronym in
+				guard let acronym = acronym else {
+					throw Abort(.notFound)
+				}
+				return acronym
+			}
+	}
 }
