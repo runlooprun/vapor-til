@@ -1,4 +1,5 @@
 import Vapor
+import Fluent
 
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
@@ -44,5 +45,32 @@ public func routes(_ router: Router) throws {
 		return try req.parameters.next(Acronym.self)
 			.delete(on: req) // “Fluent allows you to call delete(on:) directly on that Future. This helps tidy up code and reduce nesting. Fluent provides convenience functions for delete, update, create and save.”
 			.transform(to: HTTPStatus.noContent)
+	}
+	
+//	/// Search acronym by term (short)
+//	router.get("api", "acronyms", "search") { req -> Future<[Acronym]> in
+//		guard
+//			let searchTerm = req.query[String.self, at: "term"]
+//		else {
+//			throw Abort(.badRequest)
+//		}
+//		
+//		return Acronym.query(on: req)
+//			.filter(\.short == searchTerm)
+//			.all()
+//	}
+	
+	/// Search acronym by term (short or long)
+	router.get("api", "acronyms", "search") { req -> Future<[Acronym]> in
+		guard
+			let searchTerm = req.query[String.self, at: "term"]
+		else {
+			throw Abort(.badRequest)
+		}
+		
+		return Acronym.query(on: req).group(.or) { or in
+			or.filter(\.short == searchTerm)
+			or.filter(\.long == searchTerm)
+		}.all()
 	}
 }
