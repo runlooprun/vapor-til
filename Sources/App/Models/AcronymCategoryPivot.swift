@@ -3,7 +3,6 @@ import Foundation
 
 
 final class AcronymCategoryPivot: PostgreSQLUUIDPivot, ModifiablePivot {
-	
 	var id: UUID?
 	var acronymID: Acronym.ID
 	var categoryID: Category.ID
@@ -18,7 +17,14 @@ final class AcronymCategoryPivot: PostgreSQLUUIDPivot, ModifiablePivot {
 		self.acronymID = try acronym.requireID()
 		self.categoryID = try category.requireID()
 	}
-	
 }
 
-extension AcronymCategoryPivot: Migration {}
+extension AcronymCategoryPivot: Migration {
+	static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
+		return Database.create(self, on: connection) { builder in
+			try self.addProperties(to: builder)
+			builder.reference(from: \.acronymID, to: \Acronym.id, onDelete: .cascade) // When you delete acronym, this pivot will be deleted.
+			builder.reference(from: \.categoryID, to: \Category.id, onDelete: .cascade) // When you delete category, this pivot will be deleted.
+		}
+	}
+}
