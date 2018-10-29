@@ -18,6 +18,9 @@ extension Acronym {
 	var user: Parent<Acronym, User> {
 		return self.parent(\.userID)
 	}
+	var categories: Siblings<Acronym, Category, AcronymCategoryPivot> {
+		return self.siblings()
+	}
 }
 
 extension Acronym: Migration {
