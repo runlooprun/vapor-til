@@ -16,13 +16,14 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 	// middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
 	middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
 	services.register(middlewares)
-
+	
 	// Register the configured SQLite database to the database config.
 	var databases = DatabasesConfig()
 	let databaseConfig = PostgreSQLDatabaseConfig(
 		hostname: Environment.get("DATABASE_HOSTNAME") ?? "localhost",
+		port: (env == .testing ? 5433 : 5432),
 		username: Environment.get("DATABASE_USER") ?? "vapor",
-		database: Environment.get("DATABASE_DB") ?? "vapor",
+		database: (env == .testing ? "vapor-test" : Environment.get("DATABASE_DB") ?? "vapor"),
 		password: Environment.get("DATABSE_PASSWORD") ?? "password"
 	)
 	let database = PostgreSQLDatabase(config: databaseConfig)
