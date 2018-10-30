@@ -54,14 +54,14 @@ extension Application {
 		_ = try self.sendRequest(to: path, method: method, headers: headers, body: data)
 	}
 	
-	func getResponse<C, T>(from path: String, method: HTTPMethod = .GET, headers: HTTPHeaders = .init(), data: C? = nil, decodeTo type: T.Type) throws -> T where C: Content, T: Decodable {
+	func getResponse<C, T>(to path: String, method: HTTPMethod = .GET, headers: HTTPHeaders = .init(), data: C? = nil, decodeTo type: T.Type) throws -> T where C: Content, T: Decodable {
 		let response = try self.sendRequest(to: path, method: method, headers: headers, body: data)
 		return try response.content.decode(type).wait()
 	}
 	
-	func getResponse<T>(from path: String, method: HTTPMethod = .GET, headers: HTTPHeaders = .init(), decodeTo type: T.Type) throws -> T where T: Decodable {
+	func getResponse<T>(to path: String, method: HTTPMethod = .GET, headers: HTTPHeaders = .init(), decodeTo type: T.Type) throws -> T where T: Content {
 		let emptyContent: EmptyContent? = nil
-		return try self.getResponse(from: path, method: method, headers: headers, data: emptyContent, decodeTo: type)
+		return try self.getResponse(to: path, method: method, headers: headers, data: emptyContent, decodeTo: type)
 	}
 }
 
